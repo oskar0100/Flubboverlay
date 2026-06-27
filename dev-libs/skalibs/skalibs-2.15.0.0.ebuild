@@ -40,6 +40,6 @@ src_install() {
     emake DESTDIR="${D}" install
     # Install sysdeps required by other skarnet packages (nsss, s6, etc.)
     insinto /usr/$(get_libdir)/skalibs/sysdeps
-    doins sysdeps/*
+    doins sysdeps.cfg/*
 }
 
