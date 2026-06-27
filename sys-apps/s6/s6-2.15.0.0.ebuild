@@ -8,10 +8,10 @@ SRC_URI="https://git.skarnet.org/cgit/s6/snapshot/${P}.tar.gz"
 LICENSE="ISC"
 SLOT="0"
 KEYWORDS="~amd64"
-IUSE="shared-libs"
+IUSE="shared-libs +execline"
 DEPEND="
     >=dev-libs/skalibs-2.15.0.0
-    >=dev-lang/execline-2.9.9.0"
+    execline? ( >=dev-lang/execline-2.9.9.0 )"
 RDEPEND="${DEPEND}"
 src_configure() {
     tc-export AR CC RANLIB
@@ -23,6 +23,7 @@ src_configure() {
         --with-include=/usr/include/skalibs \
         --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
         $(usex shared-libs "--enable-shared --disable-allstatic" "") \
+		$(usex execline "" "--disable-execline") \
         || die
 }
 src_compile() {
