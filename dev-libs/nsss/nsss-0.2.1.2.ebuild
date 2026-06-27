@@ -19,6 +19,7 @@ src_configure() {
 		--libdir=/usr/$(get_libdir) \
 		--with-lib=/usr/$(get_libdir)/skalibs \
 		--with-include=/usr/include/skalibs \
+		--with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
 		$(usex shared-libs "--enable-shared --disable-allstatic" "") \
 		|| die
 }
