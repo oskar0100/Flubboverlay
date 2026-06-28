@@ -13,6 +13,11 @@ IUSE="shared-libs"
 DEPEND=">=dev-libs/skalibs-2.15.0.0"
 RDEPEND="${DEPEND}"
 
+src_prepare() {
+    default
+    sed -i '1s/^/#include <fcntl.h>\n/' src/execline/redirfd.c || die
+}
+
 src_configure() {
     tc-export AR CC RANLIB
     ./configure \
