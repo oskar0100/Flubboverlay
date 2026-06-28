@@ -36,6 +36,4 @@ src_configure() {
 
 src_install() {
 	default
-	insinto /usr/$(get_libdir)/skalibs
-	doins sysdeps.cfg/*
 }
