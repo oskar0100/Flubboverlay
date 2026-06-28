@@ -49,8 +49,8 @@ src_install() {
 
     # icon (fallback-safe pattern)
     if [[ -f "${srcdir[0]}/resources/icon.png" ]]; then
-        newicon "${srcdir[0]}/resources/icon.png" vesktop.png
-    fi
+	newicon "${FILESDIR}/vesktop.png" vesktop.png
+	fi
 
     make_desktop_entry \
         "vesktop" \
