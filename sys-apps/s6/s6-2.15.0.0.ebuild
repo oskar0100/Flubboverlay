@@ -2,38 +2,41 @@
 # Distributed under the terms of the GNU General Public License v2
 EAPI=8
 inherit toolchain-funcs
-DESCRIPTION="skarnet.org's small & secure supervision software suite"
+DESCRIPTION="skarnet.org's small and secure supervision software suite"
 HOMEPAGE="https://skarnet.org/software/s6"
 SRC_URI="https://git.skarnet.org/cgit/s6/snapshot/${P}.tar.gz"
 LICENSE="ISC"
-SLOT="0"
-KEYWORDS="~amd64"
-IUSE="shared-libs +execline"
-
-DEPEND="
-    >=dev-libs/skalibs-2.15.0.0
-    execline? ( >=dev-lang/execline-2.9.9.0 )"
-
-RDEPEND="${DEPEND}"
-
+SLOT="0/$(ver_cut 1-2)"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~riscv ~x86"
+IUSE="+execline"
+RDEPEND="
+	>=dev-libs/skalibs-2.15.0.0:=
+	execline? ( dev-lang/execline:= )
+"
+DEPEND="${RDEPEND}"
+src_prepare() {
+	default
+	sed -i -e 's/.*-Wl,--hash-style=both$/:/' configure || die
+	sed -i -e '/AR := /d' -e '/RANLIB := /d' Makefile || die
+}
 src_configure() {
-    tc-export AR CC RANLIB
-    ./configure \
-        --prefix=/usr \
-        --bindir=/usr/bin \
-        --libdir=/usr/$(get_libdir) \
-        --with-lib=/usr/$(get_libdir)/skalibs \
-        --with-include=/usr/include/skalibs \
-        --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
-        $(usex shared-libs "--enable-shared --disable-allstatic" "") \
-        $(usex execline "" "--disable-execline") \
-        || die
-}
-
-src_compile() {
-    emake
-}
-
-src_install() {
-    emake DESTDIR="${D}" install
+	tc-export AR CC RANLIB
+	local myconf=(
+		--bindir=/bin
+		--dynlibdir="/$(get_libdir)"
+		--libdir="/usr/$(get_libdir)/${PN}"
+		--libexecdir=/lib/s6
+		--with-dynlib="/$(get_libdir)"
+		--with-lib="/usr/$(get_libdir)/execline"
+		--with-lib="/usr/$(get_libdir)/skalibs"
+		--with-sysdeps="/usr/$(get_libdir)/skalibs"
+		--enable-pkgconfig
+		--pkgconfdir="/usr/$(get_libdir)/pkgconfig"
+		--enable-shared
+		--disable-allstatic
+		--disable-static
+		--disable-static-libc
+		$(use_enable execline)
+	)
+	econf "${myconf[@]}"
 }

@@ -6,31 +6,30 @@ DESCRIPTION="A small scripting language for use in init scripts and other system
 HOMEPAGE="https://skarnet.org/software/execline"
 SRC_URI="https://git.skarnet.org/cgit/execline/snapshot/${P}.tar.gz"
 LICENSE="ISC"
-SLOT="0"
-KEYWORDS="~amd64"
-IUSE="shared-libs"
-
-DEPEND=">=dev-libs/skalibs-2.15.0.0"
-RDEPEND="${DEPEND}"
-
+SLOT="0/$(ver_cut 1-2)"
+KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~riscv x86"
+RDEPEND=">=dev-libs/skalibs-2.15.0.0:="
+DEPEND="${RDEPEND}"
+src_prepare() {
+	default
+	sed -i -e 's/.*-Wl,--hash-style=both$/:/' configure || die
+	sed -i -e '/AR := /d' -e '/RANLIB := /d' Makefile || die
+}
 src_configure() {
-    tc-export AR CC RANLIB
-    ./configure \
-        --prefix=/usr \
-        --bindir=/usr/bin \
-        --libdir=/usr/$(get_libdir) \
-        --with-lib=/usr/$(get_libdir)/skalibs \
-        --with-include=/usr/include/skalibs \
-        --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
-        $(usex shared-libs "--enable-shared --disable-allstatic" "") \
-        || die
-}
-
-src_compile() {
-    sed -i 's/-std=c99/-std=gnu99/g' Makefile || die
-    emake
-}
-
-src_install() {
-    emake DESTDIR="${D}" install
+	tc-export AR CC RANLIB
+	local myconf=(
+		--bindir=/bin
+		--dynlibdir="/$(get_libdir)"
+		--libdir="/usr/$(get_libdir)/${PN}"
+		--with-dynlib="/$(get_libdir)"
+		--with-lib="/usr/$(get_libdir)/skalibs"
+		--with-sysdeps="/usr/$(get_libdir)/skalibs"
+		--enable-pkgconfig
+		--pkgconfdir="/usr/$(get_libdir)/pkgconfig"
+		--enable-shared
+		--disable-allstatic
+		--disable-static
+		--disable-static-libc
+	)
+	econf "${myconf[@]}"
 }
