@@ -8,17 +8,15 @@ DESCRIPTION="Standalone Electron-based Discord client with Vencord (prebuilt bin
 HOMEPAGE="https://github.com/Vencord/Vesktop"
 
 SRC_URI="
-    https://github.com/Vencord/Vesktop/releases/download/v${PV}/Vesktop-${PV}.tar.gz
+    https://github.com/Vencord/Vesktop/releases/download/v${PV}/vesktop-${PV}.tar.gz
         -> ${P}.tar.gz
 "
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="amd64"
+KEYWORDS="~amd64"
 
-RESTRICT="strip mirror"
-
-S="${WORKDIR}"
+RESTRICT="mirror strip"
 
 RDEPEND="
     media-libs/alsa-lib
@@ -27,18 +25,32 @@ RDEPEND="
     x11-misc/xdg-utils
 "
 
+S="${WORKDIR}"
+
 QA_PREBUILT="opt/vesktop/*"
 
 src_install() {
     insinto /opt/vesktop
-    doins -r Vesktop-linux-unpacked/* || die
 
-    [[ -f Vesktop-linux-unpacked/vesktop ]] || die "binary not found"
+    # detect unpacked directory safely (handles upstream changes)
+    local srcdir
+    srcdir=( "${WORKDIR}"/vesktop-* )
+
+    [[ -d "${srcdir[0]}" ]] || die "vesktop unpacked directory not found"
+
+    doins -r "${srcdir[0]}"/. || die
+
+    # main binary must exist
+    [[ -f "${ED}/opt/vesktop/vesktop" ]] || die "vesktop binary not found after install"
+
     fperms +x /opt/vesktop/vesktop || die
 
     dosym /opt/vesktop/vesktop /usr/bin/vesktop
 
-    newicon Vesktop-linux-unpacked/resources/icon.png vesktop.png
+    # icon (fallback-safe pattern)
+    if [[ -f "${srcdir[0]}/resources/icon.png" ]]; then
+        newicon "${srcdir[0]}/resources/icon.png" vesktop.png
+    fi
 
     make_desktop_entry \
         "vesktop" \
