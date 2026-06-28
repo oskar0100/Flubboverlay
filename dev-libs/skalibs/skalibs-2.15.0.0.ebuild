@@ -12,6 +12,7 @@ SRC_URI="https://git.skarnet.org/cgit/skalibs/snapshot/${P}.tar.gz"
 LICENSE="ISC"
 SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~riscv x86"
+
 IUSE="+static-libs shared-libs"
 
 HTML_DOCS=( doc/. )
