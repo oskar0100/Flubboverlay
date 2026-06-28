@@ -20,10 +20,11 @@ src_configure() {
         --bindir=/usr/bin \
         --libdir=/usr/$(get_libdir) \
         --with-lib=/usr/$(get_libdir)/skalibs \
+        --with-dynlib=/$(get_libdir) \
         --with-include=/usr/include/skalibs \
         --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
         $(usex shared-libs "--enable-shared --disable-allstatic" "") \
-		$(usex execline "" "--disable-execline") \
+        $(usex execline "" "--disable-execline") \
         || die
 }
 src_compile() {

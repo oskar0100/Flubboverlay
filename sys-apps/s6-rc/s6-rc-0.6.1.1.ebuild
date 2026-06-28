@@ -21,9 +21,11 @@ src_configure() {
         --bindir=/usr/bin \
         --libdir=/usr/$(get_libdir) \
         --with-lib=/usr/$(get_libdir)/skalibs \
+        --with-dynlib=/$(get_libdir) \
         --with-include=/usr/include/skalibs \
         --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
         --with-lib=/usr/$(get_libdir)/s6 \
+        --with-dynlib=/usr/$(get_libdir)/s6 \
         --with-include=/usr/include/s6 \
         $(usex shared-libs "--enable-shared --disable-allstatic" "") \
         || die
