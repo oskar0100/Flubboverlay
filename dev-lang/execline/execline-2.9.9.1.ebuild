@@ -13,12 +13,6 @@ IUSE="shared-libs"
 DEPEND=">=dev-libs/skalibs-2.15.0.0"
 RDEPEND="${DEPEND}"
 
-src_prepare() {
-    default
-    sed -i 's/-D_POSIX_C_SOURCE=200809L/-D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE/' Makefile 2>/dev/null || true
-    sed -i 's/std=c99/std=gnu99/' Makefile 2>/dev/null || true
-}
-
 src_configure() {
     tc-export AR CC RANLIB
     ./configure \
@@ -33,6 +27,7 @@ src_configure() {
 }
 
 src_compile() {
+    sed -i 's/-std=c99/-std=gnu99/g' Makefile || die
     emake
 }
 
