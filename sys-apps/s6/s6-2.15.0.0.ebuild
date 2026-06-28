@@ -9,10 +9,13 @@ LICENSE="ISC"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE="shared-libs +execline"
+
 DEPEND="
     >=dev-libs/skalibs-2.15.0.0
     execline? ( >=dev-lang/execline-2.9.9.0 )"
+
 RDEPEND="${DEPEND}"
+
 src_configure() {
     tc-export AR CC RANLIB
     ./configure \
@@ -20,16 +23,17 @@ src_configure() {
         --bindir=/usr/bin \
         --libdir=/usr/$(get_libdir) \
         --with-lib=/usr/$(get_libdir)/skalibs \
-        --with-dynlib=/$(get_libdir) \
         --with-include=/usr/include/skalibs \
         --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
         $(usex shared-libs "--enable-shared --disable-allstatic" "") \
         $(usex execline "" "--disable-execline") \
         || die
 }
+
 src_compile() {
     emake
 }
+
 src_install() {
     emake DESTDIR="${D}" install
 }

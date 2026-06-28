@@ -9,6 +9,7 @@ LICENSE="ISC"
 SLOT="0"
 KEYWORDS="~amd64"
 IUSE="shared-libs"
+
 DEPEND=">=dev-libs/skalibs-2.15.0.0"
 RDEPEND="${DEPEND}"
 
@@ -19,7 +20,6 @@ src_configure() {
         --bindir=/usr/bin \
         --libdir=/usr/$(get_libdir) \
         --with-lib=/usr/$(get_libdir)/skalibs \
-        --with-dynlib=/$(get_libdir) \
         --with-include=/usr/include/skalibs \
         --with-sysdeps=/usr/$(get_libdir)/skalibs/sysdeps \
         $(usex shared-libs "--enable-shared --disable-allstatic" "") \
