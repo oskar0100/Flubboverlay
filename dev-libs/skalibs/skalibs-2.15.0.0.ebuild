@@ -10,11 +10,13 @@ SLOT="0/$(ver_cut 1-2)"
 KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~riscv x86"
 IUSE="+static-libs shared-libs"
 HTML_DOCS=( doc/. )
+
 src_prepare() {
 	default
 	sed -i -e 's/.*-Wl,--hash-style=both$/:/' configure || die
 	sed -i -e '/AR := /d' -e '/RANLIB := /d' Makefile || die
 }
+
 src_configure() {
 	tc-export AR CC RANLIB
 	local myconf=(
@@ -31,9 +33,9 @@ src_configure() {
 	)
 	econf "${myconf[@]}"
 }
+
 src_install() {
 	default
-	rm -f "${D}"/usr/$(get_libdir)/skalibs/sysdeps
-	insinto /usr/$(get_libdir)/skalibs/sysdeps
+	insinto /usr/$(get_libdir)/skalibs
 	doins sysdeps.cfg/*
 }
