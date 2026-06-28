@@ -15,7 +15,8 @@ RDEPEND="${DEPEND}"
 
 src_prepare() {
     default
-    sed -i '1s/^/#include <fcntl.h>\n/' src/execline/redirfd.c || die
+    sed -i 's/-D_POSIX_C_SOURCE=200809L/-D_POSIX_C_SOURCE=200809L -D_GNU_SOURCE/' Makefile 2>/dev/null || true
+    sed -i 's/std=c99/std=gnu99/' Makefile 2>/dev/null || true
 }
 
 src_configure() {
