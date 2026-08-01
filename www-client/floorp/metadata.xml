@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>oskaringi93@gmail.com</email>
+		<name>Óskar</name>
+	</maintainer>
+	<use>
+		<flag name="system-libs">Link against system copies of nspr, nss, libevent,
+			libjpeg-turbo, libvpx, libwebp, and zlib instead of Mozilla's bundled/vendored
+			copies</flag>
+	</use>
+	<upstream>
+		<remote-id type="github">Floorp-Projects/Floorp</remote-id>
+	</upstream>
+</pkgmetadata>
