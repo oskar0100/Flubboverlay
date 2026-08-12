@@ -19,11 +19,15 @@ DESCRIPTION="PS3 emulator/debugger"
 HOMEPAGE="https://rpcs3.net/"
 if [[ ${PV} == "9999" ]]; then
 	EGIT_REPO_URI="https://github.com/RPCS3/rpcs3"
-	EGIT_SUBMODULES=(
-	'asmjit' '3rdparty/glslang' '3rdparty/wolfssl'
-	'3rdparty/SoundTouch/soundtouch' '3rdparty/fusion/fusion' '3rdparty/GPUOpen/VulkanMemoryAllocator'
-	'3rdparty/feralinteractive/feralinteractive' '3rdparty/yaml-cpp'
-	)
+	# NOTE: submodules are NOT listed statically here. RPCS3 adds/removes/forks
+	# bundled 3rdparty submodules fairly often (e.g. discord-rpc silently moved
+	# from discord/discord-rpc to Vestrel/discord-rpc upstream), and a hand-
+	# maintained allowlist here has previously gone stale and broken the build
+	# for any component missing from the list. Instead, src_unpack() below
+	# discovers submodules directly from RPCS3's own .gitmodules at build time
+	# and only excludes the ones we deliberately want system-provided (see
+	# SYSTEM_PROVIDED_SUBMODULES in src_unpack). This mirrors the approach
+	# used by the rpcs3-git AUR package.
 	inherit git-r3
 else
 	SRC_URI="
@@ -86,6 +90,56 @@ QA_WX_LOAD="usr/share/rpcs3/test/*"
 PATCHES=(
 	"${FILESDIR}/${PN}-system-stb.patch"
 )
+
+src_unpack() {
+	if [[ ${PV} == "9999" ]]; then
+		git-r3_src_unpack
+
+		# Dynamically discover and fetch RPCS3's bundled 3rdparty submodules
+		# instead of hand-maintaining a static EGIT_SUBMODULES allowlist.
+		# Submodules we want the SYSTEM version of instead (see DEPEND and
+		# src_configure USE_SYSTEM_* flags) are excluded by path/name match.
+		cd "${S}" || die
+
+		local SYSTEM_PROVIDED_SUBMODULES=(
+			libpng zlib curl llvm pugixml SDL cubeb ffmpeg hidapi
+			libusb miniupnp opencv protobuf rtmidi stblib zstd
+			7zip FAudio openal-soft
+		)
+
+		local submodule_paths
+		submodule_paths=$(git config --file .gitmodules --get-regexp path | awk '{print $2}') \
+			|| die "Could not read .gitmodules"
+
+		local path skip name
+		for path in ${submodule_paths}; do
+			skip=0
+			for name in "${SYSTEM_PROVIDED_SUBMODULES[@]}"; do
+				[[ ${path} == *"${name}"* ]] && skip=1 && break
+			done
+			[[ ${skip} == 1 ]] && continue
+
+			einfo "Initializing submodule: ${path}"
+			git submodule init "${path}" || die "Could not init submodule ${path}"
+
+			# Rewrite relative submodule URLs to absolute GitHub URLs the same
+			# way rpcs3-git (AUR) does, in case .gitmodules uses relative paths
+			local urlid="submodule.${path}.url"
+			local url
+			url=$(git config "${urlid}") || continue
+			if [[ ${url} != http* ]]; then
+				local resolved
+				resolved=$(git config "${urlid}" | awk -F/ '{print $(NF-1)"/"$(NF-0)}')
+				git config "${urlid}" "https://github.com/${resolved}" || die
+			fi
+
+			git -c protocol.file.allow=always submodule update --init --filter=tree:0 "${path}" \
+				|| die "Could not update submodule ${path}"
+		done
+	else
+		cmake_src_unpack
+	fi
+}
 
 src_prepare() {
 	if [[ ${PV} != "9999" ]]; then
