@@ -36,7 +36,7 @@ SRC_URI+="
 RESTRICT+=" mirror"
 S=${WORKDIR}/${MY_P}
 
-KEYWORDS="ppc64
+KEYWORDS="ppc64"
 IUSE="debug experimental hardened"
 PATCHES_USE="${IUSE}"
 
