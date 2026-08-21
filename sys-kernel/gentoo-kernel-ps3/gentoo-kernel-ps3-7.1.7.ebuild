@@ -9,7 +9,7 @@ KERNEL_IUSE_MODULES_SIGN=1
 inherit kernel-build toolchain-funcs
 
 MY_P=linux-${PV%.*}
-GENPATCHES_P=genpatches-${PV%.*}-$(( ${PV##*.} + 4 ))
+GENPATCHES_P=genpatches-7.1-10  # pinned explicitly — genpatches for this branch drifts forward, breaking the PV-derived formula
 # https://koji.fedoraproject.org/koji/packageinfo?packageID=8
 # forked to https://github.com/projg2/fedora-kernel-config-for-gentoo
 # TODO: confirm this is still the correct/latest config generation for 7.1.x
