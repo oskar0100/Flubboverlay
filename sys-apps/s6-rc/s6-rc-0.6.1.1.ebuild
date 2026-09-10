@@ -7,7 +7,8 @@ HOMEPAGE="https://skarnet.org/software/s6-rc"
 SRC_URI="https://git.skarnet.org/cgit/s6-rc/snapshot/${P}.tar.gz"
 LICENSE="ISC"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="amd64 ~arm ~x86"
+KEYWORDS="~amd64 ~arm ~x86"
+IUSE="+static-libs shared-libs static-libc"
 RDEPEND="
 	dev-lang/execline:=
 	>=dev-libs/skalibs-2.15.0.0:=
@@ -33,10 +34,9 @@ src_configure() {
 		--with-sysdeps="/usr/$(get_libdir)/skalibs"
 		--enable-pkgconfig
 		--pkgconfdir="/usr/$(get_libdir)/pkgconfig"
-		--enable-shared
-		--disable-allstatic
-		--disable-static
-		--disable-static-libc
+		$(use_enable shared-libs shared)
+		$(usex static-libs "--enable-static --enable-allstatic" "--disable-static --disable-allstatic")
+		$(use_enable static-libc)
 	)
 	econf "${myconf[@]}"
 }

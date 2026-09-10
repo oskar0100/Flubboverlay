@@ -11,9 +11,9 @@ SRC_URI="https://git.skarnet.org/cgit/execline/snapshot/${P}.tar.gz"
 
 LICENSE="ISC"
 SLOT="0/$(ver_cut 1-2)"
-KEYWORDS="~alpha amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~riscv x86"
+KEYWORDS="~alpha ~amd64 ~arm ~arm64 ~mips ~ppc ~ppc64 ~riscv x86"
 
-IUSE="+static-libs shared-libs"
+IUSE="+static-libs shared-libs static-libc"
 RDEPEND=">=dev-libs/skalibs-2.15.0.0:="
 DEPEND="${RDEPEND}"
 
@@ -35,11 +35,9 @@ src_configure() {
 		--with-sysdeps="/usr/$(get_libdir)/skalibs"
 		--enable-pkgconfig
 		--pkgconfdir="/usr/$(get_libdir)/pkgconfig"
-
 		$(use_enable shared-libs shared)
-		$(usex static-libs \
-			"--enable-static --enable-allstatic --enable-static-libc" \
-			"--disable-static --disable-allstatic --disable-static-libc")
+		$(usex static-libs "--enable-static --enable-allstatic" "--disable-static --disable-allstatic")
+		$(use_enable static-libc)
 	)
 
 	econf "${myconf[@]}"
